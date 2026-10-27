@@ -1,0 +1,13 @@
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
+    && rm -rf /var/lib/apt/lists/*
+# U-01 취약: root 원격접속 허용
+RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+# U-02 취약: 최소 길이 4
+RUN echo 'minlen = 4' >> /etc/security/pwquality.conf
+# U-03 취약: 계정 잠금 미설정(기본 상태 유지)
+# U-05 취약: root 외 UID 0 계정
+RUN useradd -o -u 0 -g 0 -M -s /bin/bash backdoor
+COPY . /opt/checker
+WORKDIR /opt/checker
+CMD ["bash", "-c", "for s in checks/linux/U-0[1-5].sh; do bash \"$s\"; done | jq -s '.'"]
