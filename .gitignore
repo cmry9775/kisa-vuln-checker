@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# lib/  (우리 프로젝트의 lib/는 추적)
+# lib64/
 parts/
 sdist/
 var/
@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# 프로젝트 공통 스크립트는 추적
+!lib/
+!lib/*.sh
