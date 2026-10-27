@@ -8,6 +8,16 @@ RUN echo 'minlen = 4' >> /etc/security/pwquality.conf
 # U-03 취약: 계정 잠금 미설정(기본 상태 유지)
 # U-05 취약: root 외 UID 0 계정
 RUN useradd -o -u 0 -g 0 -M -s /bin/bash backdoor
+# U-14 취약: root 프로필 PATH 맨 앞에 "." 포함
+RUN echo 'export PATH=.:$PATH' >> /root/.bashrc
+# U-15 취약: 소유자 없는 파일 (UID 54321 은 passwd 에 없음)
+RUN touch /var/orphan.txt && chown 54321:54321 /var/orphan.txt
+# U-16 취약: /etc/passwd 권한 과다
+RUN chmod 666 /etc/passwd
+# U-17 취약: 시작 스크립트 others 쓰기 허용
+RUN printf '#!/bin/sh\nexit 0\n' > /etc/init.d/badsvc && chmod 777 /etc/init.d/badsvc
+# U-18 취약: /etc/shadow 권한 과다
+RUN chmod 644 /etc/shadow
 COPY . /opt/checker
 WORKDIR /opt/checker
-CMD ["bash", "-c", "for s in checks/linux/U-0[1-5].sh; do bash \"$s\"; done | jq -s '.'"]
+CMD ["bash", "run_all.sh"]
