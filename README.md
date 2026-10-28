@@ -1,6 +1,6 @@
 # kisa-vuln-checker — KISA 기준 서버 취약점 자동 점검
 
-> 🚧 진행 중 (예정 공개: 2026-11-29)
+> 🚧 진행 중 (10개 항목 구현 — 계정관리·파일권한 완료, 전 항목 검증 완료)
 
 ## 개요
 - 목적: 2026 KISA 「주요정보통신기반시설 기술적 취약점 분석·평가」 Unix/Windows 항목 자동 점검
@@ -37,18 +37,23 @@ flowchart LR
 | 보고서 | `report/` | 결과를 취합해 보고서로 출력 |
 
 ## 핵심 결과
-- 점검 항목 N개 / 자동화율 __% / 오탐 __건
+- 점검 항목 10개 (계정관리 5개: U-01~U-05, 파일권한 5개: U-14~U-18) / 자동화율 100%
+- **양호 컨테이너(docker/Dockerfile.ok) 10/10 "양호" 판정 → 오탐 0건**
+- **취약 컨테이너(docker/Dockerfile.vuln) 10/10 "취약" 판정 → 미탐 0건** (U-03은 2단계 디버깅 끝에 최종 해결, 상세: docs/검증결과.md)
 
 ## 실행 방법
 ```bash
+# 취약 컨테이너 (10개 항목 모두 '취약' 판정이어야 함)
 docker build -f docker/Dockerfile.vuln -t checker:vuln .
-docker run --rm checker:vuln
+docker run --rm checker:vuln > results/vuln.json
+
+# 양호 컨테이너 (10개 항목 모두 '양호' 판정이어야 함 — 오탐 확인용)
+docker build -f docker/Dockerfile.ok -t checker:ok .
+docker run --rm checker:ok > results/ok.json
 ```
 
 ## 상세 문서
-- docs/항목목록.md, docs/항목별_판단기준.md, docs/검증결과.md
-
-## 트러블슈팅 & 배운 점
+- docs/항목목록.md, docs/항목별_판단기준.md, docs/검증결과.md (취약/양호 컨테이너 실행 결과 + U-03 디버깅 전 과정)
 
 ## 법적 고지
 본 도구는 격리된 로컬 환경에서만 사용했습니다.

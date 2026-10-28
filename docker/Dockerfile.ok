@@ -1,0 +1,33 @@
+# 양호(Good) 컨테이너 — U-01~U-05, U-14~U-18이 모두 "양호"로 판정되어야 함(오탐 0건 확인용)
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# U-01 양호: root 원격접속 차단
+RUN sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config \
+    || echo 'PermitRootLogin no' >> /etc/ssh/sshd_config
+
+# U-02 양호: 최소 길이 8 이상
+RUN echo 'minlen = 8' >> /etc/security/pwquality.conf
+
+# U-03 양호: 계정 잠금 임계값 5회
+RUN mkdir -p /etc/security && echo 'deny = 5' >> /etc/security/faillock.conf
+
+# U-04 양호: 기본 shadow 사용 (ubuntu 기본값, 별도 조치 불필요)
+# U-05 양호: UID 0 계정은 root뿐 (기본값, 별도 조치 불필요)
+
+# U-14 양호: PATH에 '.' 없음 (기본값, 별도 조치 불필요)
+
+# U-15 양호: 소유자 없는 파일 없음 (기본값, 별도 조치 불필요)
+
+# U-16 양호: /etc/passwd 소유자 root, 권한 644
+RUN chown root:root /etc/passwd && chmod 644 /etc/passwd
+
+# U-17 양호: 시작 스크립트 소유자 root, others 쓰기 금지 (기본값, 별도 조치 불필요)
+
+# U-18 양호: /etc/shadow 소유자 root, 권한 400 (KISA 기준 — 우분투 기본 640보다 엄격)
+RUN chown root:root /etc/shadow && chmod 400 /etc/shadow
+
+COPY . /opt/checker
+WORKDIR /opt/checker
+CMD ["bash", "run_all.sh"]

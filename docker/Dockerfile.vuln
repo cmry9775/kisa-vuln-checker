@@ -5,7 +5,8 @@ RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 # U-02 취약: 최소 길이 4
 RUN echo 'minlen = 4' >> /etc/security/pwquality.conf
-# U-03 취약: 계정 잠금 미설정
+# U-03 취약: 계정 잠금 임계값 과도하게 높게 설정 (= 미설정과 동일 효과)
+RUN mkdir -p /etc/security && echo 'deny = 99' >> /etc/security/faillock.conf
 # U-05 취약: root 외 UID 0 계정
 RUN useradd -o -u 0 -g 0 -M -s /bin/bash backdoor
 # U-14 취약: root 프로필 PATH 맨 앞에 "." 포함

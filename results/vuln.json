@@ -1,0 +1,82 @@
+[
+  {
+    "id": "U-01",
+    "title": "root 계정 원격 접속 제한",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "PermitRootLogin=yes",
+    "remediation": "sshd_config에 PermitRootLogin no 설정 후 sshd 재시작"
+  },
+  {
+    "id": "U-02",
+    "title": "비밀번호 관리정책 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "minlen=4",
+    "remediation": "pwquality.conf에 minlen 8 이상 및 복잡성(-1) 설정"
+  },
+  {
+    "id": "U-03",
+    "title": "계정 잠금 임계값 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "deny=99",
+    "remediation": "pam_faillock deny=10 이하 설정"
+  },
+  {
+    "id": "U-04",
+    "title": "비밀번호 파일 보호",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "shadow 사용(전부 x)",
+    "remediation": "pwconv 명령으로 쉐도우 비밀번호 적용"
+  },
+  {
+    "id": "U-05",
+    "title": "root 이외의 UID 0 금지",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "UID0 계정: backdoor",
+    "remediation": "root 외 UID 0 계정을 다른 UID로 변경 또는 제거"
+  },
+  {
+    "id": "U-14",
+    "title": "root 홈, 패스 디렉터리 권한 및 패스 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "PATH 에 . 또는 빈 항목 포함: /root/.bashrc",
+    "remediation": "/etc/profile, ~/.profile, ~/.bashrc 의 PATH 에서 \".\" 및 빈 항목(::, 앞뒤 :) 제거 또는 맨 뒤로 이동"
+  },
+  {
+    "id": "U-15",
+    "title": "파일 및 디렉토리 소유자 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "1건: /var/orphan.txt",
+    "remediation": "소유자/그룹 없는 파일은 제거하거나 chown/chgrp 로 소유자 지정"
+  },
+  {
+    "id": "U-16",
+    "title": "/etc/passwd 파일 소유자 및 권한 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "소유자/권한: root 666 (기준: root, 644 이하)",
+    "remediation": "chown root /etc/passwd; chmod 644 /etc/passwd"
+  },
+  {
+    "id": "U-17",
+    "title": "시스템 시작 스크립트 권한 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "부적절: /etc/init.d/badsvc(root,777)",
+    "remediation": "chown root <파일>; chmod o-w <파일> (일반 사용자 쓰기 권한 제거)"
+  },
+  {
+    "id": "U-18",
+    "title": "/etc/shadow 파일 소유자 및 권한 설정",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "소유자/권한: root 644 (기준: root, 400 이하)",
+    "remediation": "chown root /etc/shadow; chmod 400 /etc/shadow"
+  }
+]
