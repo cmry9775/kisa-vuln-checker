@@ -19,6 +19,16 @@ RUN chmod 666 /etc/passwd
 RUN printf '#!/bin/sh\nexit 0\n' > /etc/init.d/badsvc && chmod 777 /etc/init.d/badsvc
 # U-18 취약: /etc/shadow 권한 과다
 RUN chmod 644 /etc/shadow
+# U-19 취약: finger 서비스 활성화 설정
+RUN mkdir -p /etc/xinetd.d && printf 'service finger\n{\n  disable = no\n}\n' > /etc/xinetd.d/finger
+# U-20 취약: hosts.equiv에 신뢰 호스트(+) 등록
+RUN echo '+' > /etc/hosts.equiv
+# U-21 취약: Anonymous FTP 허용
+RUN echo 'anonymous_enable=YES' >> /etc/vsftpd.conf
+# U-22 취약: SNMP community string 기본값(public) 사용
+RUN mkdir -p /etc/snmp && echo 'rocommunity public' >> /etc/snmp/snmpd.conf
+# U-23 취약: NFS 전체 공개 + no_root_squash
+RUN echo '/export *(rw,no_root_squash)' >> /etc/exports
 COPY . /opt/checker
 WORKDIR /opt/checker
 CMD ["bash", "run_all.sh"]

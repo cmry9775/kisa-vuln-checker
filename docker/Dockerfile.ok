@@ -28,6 +28,13 @@ RUN chown root:root /etc/passwd && chmod 644 /etc/passwd
 # U-18 양호: /etc/shadow 소유자 root, 권한 400 (KISA 기준 — 우분투 기본 640보다 엄격)
 RUN chown root:root /etc/shadow && chmod 400 /etc/shadow
 
+# U-19 양호: finger 등 불필요 서비스 비활성(기본값, 별도 조치 불필요)
+# U-20 양호: rsh 계열 비활성, .rhosts·hosts.equiv 미사용(기본값, 별도 조치 불필요)
+# U-21 양호: Anonymous FTP 차단
+RUN echo 'anonymous_enable=NO' >> /etc/vsftpd.conf
+# U-22 양호: community string을 기본값이 아닌 값으로 설정
+RUN mkdir -p /etc/snmp && echo 'rocommunity Xk91$qZpL7' >> /etc/snmp/snmpd.conf
+# U-23 양호: NFS 미사용(기본값, 별도 조치 불필요)
 COPY . /opt/checker
 WORKDIR /opt/checker
 CMD ["bash", "run_all.sh"]
