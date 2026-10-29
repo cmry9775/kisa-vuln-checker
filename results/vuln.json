@@ -78,5 +78,45 @@
     "result": "취약",
     "evidence": "소유자/권한: root 644 (기준: root, 400 이하)",
     "remediation": "chown root /etc/shadow; chmod 400 /etc/shadow"
+  },
+  {
+    "id": "U-19",
+    "title": "불필요한 서비스 비활성화 (finger·telnet·tftp·talk)",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "활성화된 서비스: finger(xinetd)",
+    "remediation": "xinetd.d 설정에서 해당 서비스 disable = yes 로 변경, 또는 패키지 제거 후 systemctl disable --now"
+  },
+  {
+    "id": "U-20",
+    "title": "r 계열 서비스 비활성화 (rsh/rlogin/rexec)",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "발견: hosts.equiv",
+    "remediation": "xinetd.d의 shell/login/exec disable = yes 설정, .rhosts/hosts.equiv 파일 제거"
+  },
+  {
+    "id": "U-21",
+    "title": "Anonymous FTP 비활성화",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "anonymous_enable=yes",
+    "remediation": "vsftpd.conf 등에서 anonymous_enable = NO 로 설정 후 서비스 재시작"
+  },
+  {
+    "id": "U-22",
+    "title": "SNMP 서비스 및 community string 점검",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "기본 community 문자열 사용: rocommunity public",
+    "remediation": "community 문자열을 public/private 등 기본값에서 추측 불가능한 값으로 변경, 불필요 시 SNMP 서비스 비활성화"
+  },
+  {
+    "id": "U-23",
+    "title": "NFS/NIS 서비스 비활성화 및 접근 통제",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "위험한 공유 설정: /export *(rw,no_root_squash)",
+    "remediation": "불필요한 NFS 공유 제거, /etc/exports에 접근 허용 IP를 명시하고 no_root_squash 제거"
   }
 ]
