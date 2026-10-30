@@ -78,5 +78,85 @@
     "result": "양호",
     "evidence": "소유자/권한: root 400 (기준: root, 400 이하)",
     "remediation": "chown root /etc/shadow; chmod 400 /etc/shadow"
+  },
+  {
+    "id": "U-19",
+    "title": "불필요한 서비스 비활성화 (finger·telnet·tftp·talk)",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "finger/telnet/tftp/talk 서비스가 활성 설정되어 있지 않음",
+    "remediation": "xinetd.d 설정에서 해당 서비스 disable = yes 로 변경, 또는 패키지 제거 후 systemctl disable --now"
+  },
+  {
+    "id": "U-20",
+    "title": "r 계열 서비스 비활성화 (rsh/rlogin/rexec)",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "rsh/rlogin/rexec 비활성, .rhosts·hosts.equiv 미사용",
+    "remediation": "xinetd.d의 shell/login/exec disable = yes 설정, .rhosts/hosts.equiv 파일 제거"
+  },
+  {
+    "id": "U-21",
+    "title": "Anonymous FTP 비활성화",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "anonymous_enable=no",
+    "remediation": "vsftpd.conf 등에서 anonymous_enable = NO 로 설정 후 서비스 재시작"
+  },
+  {
+    "id": "U-22",
+    "title": "SNMP 서비스 및 community string 점검",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "public/private 등 기본 community 문자열 미사용",
+    "remediation": "community 문자열을 public/private 등 기본값에서 추측 불가능한 값으로 변경, 불필요 시 SNMP 서비스 비활성화"
+  },
+  {
+    "id": "U-23",
+    "title": "NFS/NIS 서비스 비활성화 및 접근 통제",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "/etc/exports 없음 또는 공유 설정 없음(NFS 미사용)",
+    "remediation": "불필요한 NFS 공유 제거, /etc/exports에 접근 허용 IP를 명시하고 no_root_squash 제거"
+  },
+  {
+    "id": "U-24",
+    "title": "OS 배포판 EOL(지원종료) 여부 점검",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "ubuntu 22.04 EOL=2027-04-21 (오늘=2026-10-29 기준 지원 중)",
+    "remediation": "EOL(지원 종료)된 배포판은 최신 LTS/안정 버전으로 업그레이드"
+  },
+  {
+    "id": "U-25",
+    "title": "커널 패치 적용 여부(재부팅 대기) 점검",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "재부팅 대기 패치 없음(현재 실행 커널: 6.18.33.2-microsoft-standard-WSL2)",
+    "remediation": "최신 커널 패키지 설치 후 재부팅하여 패치된 커널을 적용"
+  },
+  {
+    "id": "U-26",
+    "title": "패키지 매니저 기준 미적용 보안 업데이트 개수 점검",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "미적용 업데이트 0건(apt list --upgradable)",
+    "remediation": "apt upgrade / yum·dnf update 등으로 대기 중인 패키지 업데이트를 적용"
+  },
+  {
+    "id": "U-27",
+    "title": "마지막 패치 적용 일자(최근성) 점검",
+    "severity": "중",
+    "result": "양호",
+    "evidence": "마지막 패치 적용일: 2026-10-29  08:52:40 (0일 경과, 기준 90일 이내)",
+    "remediation": "정기적인 패치 적용 주기(분기 1회 이상 권장)를 수립하고 준수"
+  },
+  {
+    "id": "U-28",
+    "title": "핵심 서비스(OpenSSH·OpenSSL) 버전 및 EOL 점검",
+    "severity": "상",
+    "result": "양호",
+    "evidence": "OpenSSH 8.9, OpenSSL 3.0.2 — EOL 대상 아님",
+    "remediation": "배포판 패키지 매니저로 OpenSSH·OpenSSL을 최신 버전으로 업데이트"
   }
 ]

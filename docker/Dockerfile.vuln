@@ -1,3 +1,4 @@
+# 취약(Vulnerable) 컨테이너 — U-01~U-05, U-14~U-28이 모두 "취약"으로 판정되어야 함
 FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
     && rm -rf /var/lib/apt/lists/*
@@ -29,6 +30,21 @@ RUN echo 'anonymous_enable=YES' >> /etc/vsftpd.conf
 RUN mkdir -p /etc/snmp && echo 'rocommunity public' >> /etc/snmp/snmpd.conf
 # U-23 취약: NFS 전체 공개 + no_root_squash
 RUN echo '/export *(rw,no_root_squash)' >> /etc/exports
+
+# U-24 취약: EOL 지난 배포판(Ubuntu 18.04, EOL 2023-05-31)으로 /etc/os-release 변조
+RUN sed -i 's/VERSION_ID="22.04"/VERSION_ID="18.04"/' /etc/os-release
+# U-25 취약: 재부팅 대기 중인 커널 패치가 있는 상태를 재현
+RUN mkdir -p /var/run && echo 'linux-image-5.15.0-generic' > /var/run/reboot-required.pkgs && touch /var/run/reboot-required
+# U-26 취약: 미적용 보안 업데이트 2건 상황을 재현
+#   (Docker 빌드 시점마다 실제 패키지 버전 차이를 고정하기 어려워, apt list --upgradable 출력을 모의하는 래퍼로 재현)
+RUN printf '#!/bin/bash\nif [ "$1" = "list" ]; then\n  echo "Listing... Done"\n  echo "libssl3/jammy-security 3.0.2-0ubuntu1.10 amd64 [upgradable from: 3.0.2-0ubuntu1.9]"\n  echo "openssh-server/jammy-security 1:8.9p1-3ubuntu0.6 amd64 [upgradable from: 1:8.9p1-3ubuntu0.4]"\nelse\n  exec /usr/bin/apt "$@"\nfi\n' > /usr/local/bin/apt && chmod +x /usr/local/bin/apt
+# U-27 취약: 마지막 패치 적용일을 120일 전으로 재현(기준 90일 초과)
+RUN printf 'Start-Date: %s\nCommandline: apt upgrade\nEnd-Date: %s\n' "$(date -d '120 days ago' '+%Y-%m-%d  %H:%M:%S')" "$(date -d '120 days ago' '+%Y-%m-%d  %H:%M:%S')" >> /var/log/apt/history.log
+# U-28 취약: EOL 지난 OpenSSH(7.4)·OpenSSL(1.1.1) 버전 상황을 재현
+#   (실 바이너리 교체가 아닌, 버전 조회 명령의 출력만 모의하는 래퍼로 재현)
+RUN printf '#!/bin/bash\necho "OpenSSH_7.4p1, OpenSSL 1.0.2k-fips  26 Jan 2017" >&2\n' > /usr/local/bin/ssh && chmod +x /usr/local/bin/ssh
+RUN printf '#!/bin/bash\nif [ "$1" = "version" ]; then\n  echo "OpenSSL 1.1.1 11 Sep 2018"\nelse\n  exec /usr/bin/openssl "$@"\nfi\n' > /usr/local/bin/openssl && chmod +x /usr/local/bin/openssl
+
 COPY . /opt/checker
 WORKDIR /opt/checker
 CMD ["bash", "run_all.sh"]

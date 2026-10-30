@@ -1,4 +1,4 @@
-# 양호(Good) 컨테이너 — U-01~U-05, U-14~U-18이 모두 "양호"로 판정되어야 함(오탐 0건 확인용)
+# 양호(Good) 컨테이너 — U-01~U-05, U-14~U-28이 모두 "양호"로 판정되어야 함(오탐 0건 확인용)
 FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
     && rm -rf /var/lib/apt/lists/*
@@ -35,6 +35,13 @@ RUN echo 'anonymous_enable=NO' >> /etc/vsftpd.conf
 # U-22 양호: community string을 기본값이 아닌 값으로 설정
 RUN mkdir -p /etc/snmp && echo 'rocommunity Xk91$qZpL7' >> /etc/snmp/snmpd.conf
 # U-23 양호: NFS 미사용(기본값, 별도 조치 불필요)
+
+# U-24 양호: EOL 전 배포판(Ubuntu 22.04, EOL 2027-04-21) 유지 (기본값, 별도 조치 불필요)
+# U-25 양호: 재부팅 대기 패치 없음 (기본값, 별도 조치 불필요)
+# U-26 양호: 설치 직후 apt 캐시를 정리하여 미적용 업데이트 없음 (기본값, 별도 조치 불필요)
+# U-27 양호: 이미지 빌드 시점(apt-get install)이 곧 마지막 패치 적용일이므로 최근성 기준 충족 (기본값, 별도 조치 불필요)
+# U-28 양호: Ubuntu 22.04 기본 OpenSSH 8.9 / OpenSSL 3.0.x 사용(둘 다 EOL 전) (기본값, 별도 조치 불필요)
+
 COPY . /opt/checker
 WORKDIR /opt/checker
 CMD ["bash", "run_all.sh"]
