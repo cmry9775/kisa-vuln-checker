@@ -118,6 +118,7 @@
     "result": "취약",
     "evidence": "위험한 공유 설정: /export *(rw,no_root_squash)",
     "remediation": "불필요한 NFS 공유 제거, /etc/exports에 접근 허용 IP를 명시하고 no_root_squash 제거"
+<<<<<<< HEAD
   },
   {
     "id": "U-24",
@@ -158,5 +159,7 @@
     "result": "취약",
     "evidence": "OpenSSH 7.4(8.0 미만, 오래된 버전); OpenSSL 1.1.1(EOL 지난 버전); (OpenSSH 7.4, OpenSSL 1.1.1)",
     "remediation": "배포판 패키지 매니저로 OpenSSH·OpenSSL을 최신 버전으로 업데이트"
+=======
+>>>>>>> 3306007c0117e8f4b9071f6c4eea4a896ca982f5
   }
 ]

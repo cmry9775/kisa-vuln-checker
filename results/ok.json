@@ -118,6 +118,7 @@
     "result": "양호",
     "evidence": "/etc/exports 없음 또는 공유 설정 없음(NFS 미사용)",
     "remediation": "불필요한 NFS 공유 제거, /etc/exports에 접근 허용 IP를 명시하고 no_root_squash 제거"
+<<<<<<< HEAD
   },
   {
     "id": "U-24",
@@ -158,5 +159,7 @@
     "result": "양호",
     "evidence": "OpenSSH 8.9, OpenSSL 3.0.2 — EOL 대상 아님",
     "remediation": "배포판 패키지 매니저로 OpenSSH·OpenSSL을 최신 버전으로 업데이트"
+=======
+>>>>>>> 3306007c0117e8f4b9071f6c4eea4a896ca982f5
   }
 ]
