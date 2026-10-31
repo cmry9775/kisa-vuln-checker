@@ -1,0 +1,56 @@
+# 취약(Vulnerable) 컨테이너 — U-01~U-05, U-14~U-28이 모두 "취약"으로 판정되어야 함
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
+    && rm -rf /var/lib/apt/lists/*
+# U-01 취약: root 원격접속 허용
+RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+# U-02 취약: 최소 길이 4
+RUN echo 'minlen = 4' >> /etc/security/pwquality.conf
+# U-03 취약: 계정 잠금 임계값 과도하게 높게 설정 (= 미설정과 동일 효과)
+RUN mkdir -p /etc/security && echo 'deny = 99' >> /etc/security/faillock.conf
+# U-05 취약: root 외 UID 0 계정
+RUN useradd -o -u 0 -g 0 -M -s /bin/bash backdoor
+# U-14 취약: root 프로필 PATH 맨 앞에 "." 포함
+RUN echo 'export PATH=.:$PATH' >> /root/.bashrc
+# U-15 취약: 소유자 없는 파일 (UID 54321 은 passwd 에 없음)
+RUN touch /var/orphan.txt && chown 54321:54321 /var/orphan.txt
+# U-16 취약: /etc/passwd 권한 과다
+RUN chmod 666 /etc/passwd
+# U-17 취약: 시작 스크립트 others 쓰기 허용
+RUN printf '#!/bin/sh\nexit 0\n' > /etc/init.d/badsvc && chmod 777 /etc/init.d/badsvc
+# U-18 취약: /etc/shadow 권한 과다
+RUN chmod 644 /etc/shadow
+# U-19 취약: finger 서비스 활성화 설정
+RUN mkdir -p /etc/xinetd.d && printf 'service finger\n{\n  disable = no\n}\n' > /etc/xinetd.d/finger
+# U-20 취약: hosts.equiv에 신뢰 호스트(+) 등록
+RUN echo '+' > /etc/hosts.equiv
+# U-21 취약: Anonymous FTP 허용
+RUN echo 'anonymous_enable=YES' >> /etc/vsftpd.conf
+# U-22 취약: SNMP community string 기본값(public) 사용
+RUN mkdir -p /etc/snmp && echo 'rocommunity public' >> /etc/snmp/snmpd.conf
+# U-23 취약: NFS 전체 공개 + no_root_squash
+RUN echo '/export *(rw,no_root_squash)' >> /etc/exports
+
+# U-24 취약: EOL 지난 배포판(Ubuntu 18.04, EOL 2023-05-31)으로 /etc/os-release 변조
+RUN sed -i 's/VERSION_ID="22.04"/VERSION_ID="18.04"/' /etc/os-release
+# U-25 취약: 재부팅 대기 중인 커널 패치가 있는 상태를 재현
+RUN mkdir -p /var/run && echo 'linux-image-5.15.0-generic' > /var/run/reboot-required.pkgs && touch /var/run/reboot-required
+# U-26 취약: 미적용 보안 업데이트 2건 상황을 재현
+#   (Docker 빌드 시점마다 실제 패키지 버전 차이를 고정하기 어려워, apt list --upgradable 출력을 모의하는 래퍼로 재현)
+RUN printf '#!/bin/bash\nif [ "$1" = "list" ]; then\n  echo "Listing... Done"\n  echo "libssl3/jammy-security 3.0.2-0ubuntu1.10 amd64 [upgradable from: 3.0.2-0ubuntu1.9]"\n  echo "openssh-server/jammy-security 1:8.9p1-3ubuntu0.6 amd64 [upgradable from: 1:8.9p1-3ubuntu0.4]"\nelse\n  exec /usr/bin/apt "$@"\nfi\n' > /usr/local/bin/apt && chmod +x /usr/local/bin/apt
+# U-27 취약: 마지막 패치 적용일을 120일 전으로 재현(기준 90일 초과)
+RUN printf 'Start-Date: %s\nCommandline: apt upgrade\nEnd-Date: %s\n' "$(date -d '120 days ago' '+%Y-%m-%d  %H:%M:%S')" "$(date -d '120 days ago' '+%Y-%m-%d  %H:%M:%S')" >> /var/log/apt/history.log
+# U-28 취약: EOL 지난 OpenSSH(7.4)·OpenSSL(1.1.1) 버전 상황을 재현
+#   (실 바이너리 교체가 아닌, 버전 조회 명령의 출력만 모의하는 래퍼로 재현)
+RUN printf '#!/bin/bash\necho "OpenSSH_7.4p1, OpenSSL 1.0.2k-fips  26 Jan 2017" >&2\n' > /usr/local/bin/ssh && chmod +x /usr/local/bin/ssh
+RUN printf '#!/bin/bash\nif [ "$1" = "version" ]; then\n  echo "OpenSSL 1.1.1 11 Sep 2018"\nelse\n  exec /usr/bin/openssl "$@"\nfi\n' > /usr/local/bin/openssl && chmod +x /usr/local/bin/openssl
+
+# U-30 취약: 로그 파일 소유자·권한 과다(비 root 소유, 666)
+RUN touch /var/log/syslog && chown nobody:nogroup /var/log/syslog && chmod 666 /var/log/syslog
+# U-31 취약: 로그 보존 기간 과소 설정(rotate 1, 기준 4 미만)
+RUN echo 'rotate 1' > /etc/logrotate.conf
+# (U-29, U-32, U-33은 rsyslog 설정·auditd 설정 파일을 전혀 만들지 않아 기본 상태로 취약 판정됨)
+
+COPY . /opt/checker
+WORKDIR /opt/checker
+CMD ["bash", "run_all.sh"]

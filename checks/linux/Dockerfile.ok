@@ -1,0 +1,58 @@
+# 양호(Good) 컨테이너 — U-01~U-05, U-14~U-28이 모두 "양호"로 판정되어야 함(오탐 0건 확인용)
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y openssh-server libpam-pwquality jq \
+    && rm -rf /var/lib/apt/lists/*
+
+# U-01 양호: root 원격접속 차단
+RUN sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config \
+    || echo 'PermitRootLogin no' >> /etc/ssh/sshd_config
+
+# U-02 양호: 최소 길이 8 이상
+RUN echo 'minlen = 8' >> /etc/security/pwquality.conf
+
+# U-03 양호: 계정 잠금 임계값 5회
+RUN mkdir -p /etc/security && echo 'deny = 5' >> /etc/security/faillock.conf
+
+# U-04 양호: 기본 shadow 사용 (ubuntu 기본값, 별도 조치 불필요)
+# U-05 양호: UID 0 계정은 root뿐 (기본값, 별도 조치 불필요)
+
+# U-14 양호: PATH에 '.' 없음 (기본값, 별도 조치 불필요)
+
+# U-15 양호: 소유자 없는 파일 없음 (기본값, 별도 조치 불필요)
+
+# U-16 양호: /etc/passwd 소유자 root, 권한 644
+RUN chown root:root /etc/passwd && chmod 644 /etc/passwd
+
+# U-17 양호: 시작 스크립트 소유자 root, others 쓰기 금지 (기본값, 별도 조치 불필요)
+
+# U-18 양호: /etc/shadow 소유자 root, 권한 400 (KISA 기준 — 우분투 기본 640보다 엄격)
+RUN chown root:root /etc/shadow && chmod 400 /etc/shadow
+
+# U-19 양호: finger 등 불필요 서비스 비활성(기본값, 별도 조치 불필요)
+# U-20 양호: rsh 계열 비활성, .rhosts·hosts.equiv 미사용(기본값, 별도 조치 불필요)
+# U-21 양호: Anonymous FTP 차단
+RUN echo 'anonymous_enable=NO' >> /etc/vsftpd.conf
+# U-22 양호: community string을 기본값이 아닌 값으로 설정
+RUN mkdir -p /etc/snmp && echo 'rocommunity Xk91$qZpL7' >> /etc/snmp/snmpd.conf
+# U-23 양호: NFS 미사용(기본값, 별도 조치 불필요)
+
+# U-24 양호: EOL 전 배포판(Ubuntu 22.04, EOL 2027-04-21) 유지 (기본값, 별도 조치 불필요)
+# U-25 양호: 재부팅 대기 패치 없음 (기본값, 별도 조치 불필요)
+# U-26 양호: 설치 직후 apt 캐시를 정리하여 미적용 업데이트 없음 (기본값, 별도 조치 불필요)
+# U-27 양호: 이미지 빌드 시점(apt-get install)이 곧 마지막 패치 적용일이므로 최근성 기준 충족 (기본값, 별도 조치 불필요)
+# U-28 양호: Ubuntu 22.04 기본 OpenSSH 8.9 / OpenSSL 3.0.x 사용(둘 다 EOL 전) (기본값, 별도 조치 불필요)
+
+# U-29 양호: rsyslog 설정 파일 존재(설정 내용만으로 판단, 실제 데몬 설치는 불필요)
+RUN echo '*.* /var/log/syslog' > /etc/rsyslog.conf
+# U-30 양호: 주요 로그 파일 소유자 root, 권한 640
+RUN touch /var/log/syslog /var/log/auth.log && chown root:root /var/log/syslog /var/log/auth.log && chmod 640 /var/log/syslog /var/log/auth.log
+# U-31 양호: 로그 보존 기간(rotate) 12회로 설정(약 3개월, 기준 4회 이상)
+RUN echo 'rotate 12' > /etc/logrotate.conf
+# U-32 양호: 원격 로그 서버 전송 설정 추가
+RUN echo '*.* @@loghost.example.com:514' >> /etc/rsyslog.conf
+# U-33 양호: auditd 설정 파일 및 감사 규칙 존재
+RUN mkdir -p /etc/audit/rules.d && touch /etc/audit/auditd.conf && echo '-w /etc/passwd -p wa -k identity' > /etc/audit/rules.d/audit.rules
+
+COPY . /opt/checker
+WORKDIR /opt/checker
+CMD ["bash", "run_all.sh"]
