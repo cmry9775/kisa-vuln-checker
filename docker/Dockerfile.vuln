@@ -45,6 +45,12 @@ RUN printf 'Start-Date: %s\nCommandline: apt upgrade\nEnd-Date: %s\n' "$(date -d
 RUN printf '#!/bin/bash\necho "OpenSSH_7.4p1, OpenSSL 1.0.2k-fips  26 Jan 2017" >&2\n' > /usr/local/bin/ssh && chmod +x /usr/local/bin/ssh
 RUN printf '#!/bin/bash\nif [ "$1" = "version" ]; then\n  echo "OpenSSL 1.1.1 11 Sep 2018"\nelse\n  exec /usr/bin/openssl "$@"\nfi\n' > /usr/local/bin/openssl && chmod +x /usr/local/bin/openssl
 
+# U-30 취약: 로그 파일 소유자·권한 과다(비 root 소유, 666)
+RUN touch /var/log/syslog && chown nobody:nogroup /var/log/syslog && chmod 666 /var/log/syslog
+# U-31 취약: 로그 보존 기간 과소 설정(rotate 1, 기준 4 미만)
+RUN echo 'rotate 1' > /etc/logrotate.conf
+# (U-29, U-32, U-33은 rsyslog 설정·auditd 설정 파일을 전혀 만들지 않아 기본 상태로 취약 판정됨)
+
 COPY . /opt/checker
 WORKDIR /opt/checker
 CMD ["bash", "run_all.sh"]

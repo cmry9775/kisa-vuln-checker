@@ -42,6 +42,17 @@ RUN mkdir -p /etc/snmp && echo 'rocommunity Xk91$qZpL7' >> /etc/snmp/snmpd.conf
 # U-27 양호: 이미지 빌드 시점(apt-get install)이 곧 마지막 패치 적용일이므로 최근성 기준 충족 (기본값, 별도 조치 불필요)
 # U-28 양호: Ubuntu 22.04 기본 OpenSSH 8.9 / OpenSSL 3.0.x 사용(둘 다 EOL 전) (기본값, 별도 조치 불필요)
 
+# U-29 양호: rsyslog 설정 파일 존재(설정 내용만으로 판단, 실제 데몬 설치는 불필요)
+RUN echo '*.* /var/log/syslog' > /etc/rsyslog.conf
+# U-30 양호: 주요 로그 파일 소유자 root, 권한 640
+RUN touch /var/log/syslog /var/log/auth.log && chown root:root /var/log/syslog /var/log/auth.log && chmod 640 /var/log/syslog /var/log/auth.log
+# U-31 양호: 로그 보존 기간(rotate) 12회로 설정(약 3개월, 기준 4회 이상)
+RUN echo 'rotate 12' > /etc/logrotate.conf
+# U-32 양호: 원격 로그 서버 전송 설정 추가
+RUN echo '*.* @@loghost.example.com:514' >> /etc/rsyslog.conf
+# U-33 양호: auditd 설정 파일 및 감사 규칙 존재
+RUN mkdir -p /etc/audit/rules.d && touch /etc/audit/auditd.conf && echo '-w /etc/passwd -p wa -k identity' > /etc/audit/rules.d/audit.rules
+
 COPY . /opt/checker
 WORKDIR /opt/checker
 CMD ["bash", "run_all.sh"]
