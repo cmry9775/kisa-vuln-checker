@@ -49,7 +49,12 @@ RUN printf '#!/bin/bash\nif [ "$1" = "version" ]; then\n  echo "OpenSSL 1.1.1 11
 RUN touch /var/log/syslog && chown nobody:nogroup /var/log/syslog && chmod 666 /var/log/syslog
 # U-31 취약: 로그 보존 기간 과소 설정(rotate 1, 기준 4 미만)
 RUN echo 'rotate 1' > /etc/logrotate.conf
-# (U-29, U-32, U-33은 rsyslog 설정·auditd 설정 파일을 전혀 만들지 않아 기본 상태로 취약 판정됨)
+# U-29 취약: journald 영구 저장 비활성화
+#   (ubuntu:22.04 베이스 이미지에 /var/log/journal 디렉터리가 기본 생성되어 있어,
+#    rsyslog 미설정만으로는 U-29.sh의 journald Storage=auto 폴백 로직이 "영구 저장 중"으로
+#    오판정(양호)함 — 실제 테스트 결과로 발견. 디렉터리를 명시적으로 제거해야 취약이 재현됨)
+RUN rm -rf /var/log/journal
+# (U-32, U-33은 rsyslog 전송 규칙·auditd 설정 파일을 전혀 만들지 않아 기본 상태로 취약 판정됨)
 
 COPY . /opt/checker
 WORKDIR /opt/checker

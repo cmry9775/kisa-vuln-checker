@@ -124,7 +124,7 @@
     "title": "OS 배포판 EOL(지원종료) 여부 점검",
     "severity": "상",
     "result": "취약",
-    "evidence": "ubuntu 18.04 EOL=2023-05-31 (오늘=2026-10-29 기준 지원 종료됨)",
+    "evidence": "ubuntu 18.04 EOL=2023-05-31 (오늘=2026-11-02 기준 지원 종료됨)",
     "remediation": "EOL(지원 종료)된 배포판은 최신 LTS/안정 버전으로 업그레이드"
   },
   {
@@ -148,7 +148,7 @@
     "title": "마지막 패치 적용 일자(최근성) 점검",
     "severity": "중",
     "result": "취약",
-    "evidence": "마지막 패치 적용일: 2026-07-01  14:37:07 (120일 경과, 기준 90일 이내)",
+    "evidence": "마지막 패치 적용일: 2026-07-01  14:37:07 (123일 경과, 기준 90일 이내)",
     "remediation": "정기적인 패치 적용 주기(분기 1회 이상 권장)를 수립하고 준수"
   },
   {
@@ -158,5 +158,45 @@
     "result": "취약",
     "evidence": "OpenSSH 7.4(8.0 미만, 오래된 버전); OpenSSL 1.1.1(EOL 지난 버전); (OpenSSH 7.4, OpenSSL 1.1.1)",
     "remediation": "배포판 패키지 매니저로 OpenSSH·OpenSSL을 최신 버전으로 업데이트"
+  },
+  {
+    "id": "U-29",
+    "title": "로그 기록(Syslog) 설정 여부 점검",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "rsyslog/syslog-ng 미설정, journald 영구 저장도 비활성 — 로그가 기록되지 않거나 재부팅 시 소실될 수 있음",
+    "remediation": "rsyslog 또는 syslog-ng를 설치·설정하거나, journald Storage=persistent로 설정하여 로그를 영구 기록"
+  },
+  {
+    "id": "U-30",
+    "title": "주요 로그 파일 소유자 및 권한 점검",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "기준 미달: /var/log/syslog(owner=nobody) /var/log/syslog(perm=666)",
+    "remediation": "로그 파일 소유자를 root로, 권한을 640 이하로 설정(chown root <file>; chmod 640 <file>)"
+  },
+  {
+    "id": "U-31",
+    "title": "로그 보존 기간(로테이션) 설정 점검",
+    "severity": "중",
+    "result": "취약",
+    "evidence": "logrotate rotate=1(기준 4 미만)",
+    "remediation": "/etc/logrotate.conf의 rotate 값을 조직 로그 보관 정책(예: 4회=약 1개월 이상)에 맞게 설정"
+  },
+  {
+    "id": "U-32",
+    "title": "원격 로그 서버 전송 설정 점검",
+    "severity": "중",
+    "result": "취약",
+    "evidence": "rsyslog 미설치 — 원격 로그 전송 불가(로그가 로컬에만 남아 침해 시 조작·삭제 위험)",
+    "remediation": "rsyslog 설정에 원격 로그 서버 전송 규칙(예: *.* @@loghost:514)을 추가"
+  },
+  {
+    "id": "U-33",
+    "title": "감사 로그(auditd) 설치 및 규칙 설정 여부 점검",
+    "severity": "상",
+    "result": "취약",
+    "evidence": "auditd 미설치",
+    "remediation": "auditd를 설치하고 주요 이벤트(계정 변경, 권한 상승, 중요 파일 접근 등)에 대한 규칙을 /etc/audit/rules.d/에 등록"
   }
 ]
