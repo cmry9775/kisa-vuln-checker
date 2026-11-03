@@ -70,6 +70,7 @@ TIMEOUT=30 PARALLEL=4 ./run_all.sh > results/vuln.json
 - docs/항목목록.md, docs/항목별_판단기준.md, docs/검증결과.md (취약/양호 컨테이너 실행 결과)
 - report/kisa-vuln-checker_1차_보고서.docx (프로젝트 의의, Docker 설계, 공통 모듈 설계, U-01~U-05, U-14~U-18 설계 과정)
 - report/kisa-vuln-checker_2차_보고서.docx (서비스관리·패치관리·로그관리 U-19~U-33 설계 과정, 명령 출력 모의 래퍼 기법, 11일차 실행 전까지의 진행 경과)
+- report/kisa-vuln-checker_3차_보고서.docx (U-29~U-33 Docker 교차검증으로 25개 항목 전체 확장, run_all.sh 타임아웃·오류 흡수·병렬 실행 개선, U-29 미탐 디버깅 경과)
 
 ## 법적 고지
 본 도구는 격리된 로컬 환경에서만 사용했습니다.
