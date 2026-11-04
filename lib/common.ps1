@@ -1,4 +1,4 @@
-# lib/common.ps1 — 공통 함수. 모든 Windows 점검 스크립트가 dot-source(. )해서 사용
+﻿# lib/common.ps1 — 공통 함수. 모든 Windows 점검 스크립트가 dot-source(. )해서 사용
 # Linux 쪽 lib/common.sh(emit/perm_le/owner_is/conf_val)와 동일한 역할·스키마를 PowerShell로 구현.
 #Requires -Version 5.1
 
@@ -29,16 +29,19 @@ function Get-SecPolicyValue {
     param([Parameter(Mandatory)][string]$Key)
 
     $cfgPath = Join-Path $env:TEMP 'kisa_secpol.cfg'
-    if (-not (Test-Path $cfgPath)) {
+    if (-not (Test-Path $cfgPath) -or (Get-Item $cfgPath).Length -eq 0) {
         try {
             secedit /export /cfg "$cfgPath" /quiet | Out-Null
         } catch {
             return $null
         }
     }
-    if (-not (Test-Path $cfgPath)) { return $null }
+    if (-not (Test-Path $cfgPath) -or (Get-Item $cfgPath).Length -eq 0) { return $null }
 
-    $line = Select-String -Path $cfgPath -Pattern "^$Key\s*=" -ErrorAction SilentlyContinue | Select-Object -First 1
+    # secedit /export 결과물은 UTF-16(유니코드) 인코딩으로 생성됨.
+    # Select-String에 인코딩을 지정하지 않으면 기본 인코딩으로 읽혀 텍스트가 깨지고
+    # 패턴 매칭이 전부 실패한다(모든 secedit 기반 항목이 N/A로 나오는 원인이었음).
+    $line = Select-String -Path $cfgPath -Pattern "^$Key\s*=" -Encoding Unicode -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $line) { return $null }
 
     $val = ($line.Line -split '=', 2)[1]

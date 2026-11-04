@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-01'; $Title = 'Administrator 계정 이름 변경'; $Sev = '중'

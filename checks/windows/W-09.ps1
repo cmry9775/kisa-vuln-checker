@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-09'; $Title = '비밀번호 관리 정책 설정'; $Sev = '상'

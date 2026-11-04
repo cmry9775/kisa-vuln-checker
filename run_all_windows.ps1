@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 # Windows 전체 점검 실행 → JSON 배열 출력 (요약은 stderr)
 # 사용법 (관리자 PowerShell): .\run_all_windows.ps1 > results\win_result.json
 #

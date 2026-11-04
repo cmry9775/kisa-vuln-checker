@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-02'; $Title = 'Guest 계정 비활성화'; $Sev = '상'

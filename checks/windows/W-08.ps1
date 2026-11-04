@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-08'; $Title = '계정 잠금 기간 설정'; $Sev = '중'
