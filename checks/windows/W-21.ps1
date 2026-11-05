@@ -2,7 +2,7 @@
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-21'; $Title = '암호화되지 않는 FTP 서비스 비활성화'; $Sev = '중'
-$Fix = 'FTP 서비스를 중지하거나, 필요하면 SFTP(SSH 기반) 등 암호화된 방식으로 전환'
+$Fix = 'FTP 서비스를 중지하거나, 필요 시 SFTP(SSH 기반) 등 암호화된 방식으로 전환'
 
 $listening = $false
 $evidenceDetail = ''
