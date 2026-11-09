@@ -72,7 +72,9 @@ foreach ($s in $scripts) {
 }
 
 $sorted = $results | Sort-Object id
-Write-Output ($sorted | ConvertTo-Json -Compress -AsArray)
+$jsonOut = $sorted | ConvertTo-Json -Compress
+if ($sorted.Count -le 1) { $jsonOut = "[$jsonOut]" }
+Write-Output $jsonOut
 
 $total = $sorted.Count
 $good   = ($sorted | Where-Object { $_.result -eq '양호' }).Count
