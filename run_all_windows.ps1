@@ -72,8 +72,8 @@ foreach ($s in $scripts) {
 }
 
 $sorted = $results | Sort-Object id
-$jsonOut = $sorted | ConvertTo-Json -Compress
-if ($sorted.Count -le 1) { $jsonOut = "[$jsonOut]" }
+$jsonOut = $sorted | ConvertTo-Json
+if ($sorted.Count -le 1) { $jsonOut = "[`n$jsonOut`n]" }
 Write-Output $jsonOut
 
 $total = $sorted.Count
