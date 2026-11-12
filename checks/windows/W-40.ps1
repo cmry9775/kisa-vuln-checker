@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-40'; $Title = '정책에 따른 시스템 로깅 설정'; $Sev = '상'
