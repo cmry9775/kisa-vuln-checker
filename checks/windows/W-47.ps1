@@ -14,7 +14,8 @@ $activeOn = ($active -eq '1' -or $active -eq 1)
 $secureOn = ($secure -eq '1' -or $secure -eq 1)
 $timeoutOk = ($timeout -ge 0 -and $timeout -le 600)
 
-$evid = "ScreenSaveActive=$active, ScreenSaverIsSecure=$secure, ScreenSaveTimeOut=${timeoutRaw}초 (기준: 활성화(1) + 암호 보호(1) + 600초 이하)"
+function Show-Val($v) { if ($null -eq $v -or "$v" -eq '') { '(없음)' } else { "$v" } }
+$evid = "ScreenSaveActive=$(Show-Val $active), ScreenSaverIsSecure=$(Show-Val $secure), ScreenSaveTimeOut=$(Show-Val $timeoutRaw) (기준: 활성화(1) + 암호 보호(1) + 대기시간 600초 이하)"
 
 if ($activeOn -and $secureOn -and $timeoutOk) {
     Emit $Id $Title $Sev '양호' $evid $Fix
