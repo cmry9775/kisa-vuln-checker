@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 . "$PSScriptRoot\..\..\lib\common.ps1"
 
 $Id = 'W-52'; $Title = 'Autologon(자동 로그온) 기능 제어'; $Sev = '상'
