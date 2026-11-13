@@ -4,8 +4,7 @@
 $Id = 'W-64'; $Title = '윈도우 방화벽 설정'; $Sev = '상'
 $Fix = 'netsh advfirewall set allprofiles state on 또는 제어판 > Windows Defender 방화벽에서 도메인/개인/공용 프로필 모두 켜기로 설정'
 
-# 1) Get-NetFirewallProfile(NetSecurity 모듈) — W-21/W-34의 Get-NetTCPConnection처럼 일부 환경에서
-#    예외가 날 수 있어 try/catch로 감싸고, 실패 시 netsh 출력 파싱으로 폴백
+# 1) Get-NetFirewallProfile(NetSecurity 모듈)
 $profiles = $null
 try {
     $profiles = Get-NetFirewallProfile -ErrorAction Stop | Select-Object Name, Enabled

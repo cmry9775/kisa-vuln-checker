@@ -16,7 +16,6 @@ if (-not $raw -or $raw.Trim().Length -eq 0) {
     exit 0
 }
 
-# 하위 범주 줄은 "<범주명>   <설정값>" 형태로 끝에 성공/실패/성공 및 실패/감사 안 함 중 하나가 붙어 나옴
 $resultPattern = '(성공 및 실패|성공|실패|감사 안 함)\s*$'
 $lines = $raw -split "`r?`n" | Where-Object { $_.Trim().Length -gt 0 }
 $subcategoryLines = $lines | Where-Object { $_ -match $resultPattern }

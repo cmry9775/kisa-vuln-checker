@@ -29,8 +29,6 @@ if ($mp) {
 }
 
 # 2) Defender를 조회할 수 없는 경우(서버 Core, 타사 백신으로 Defender 비활성 등) — SecurityCenter2로 등록된 제품만 확인
-#    productState 비트마스크로 "정의 최신 여부"까지 해석하는 건 제품마다 달라 신뢰하기 어려우므로, 존재 여부까지만
-#    자동 판정하고 정의 최신성은 수동 확인으로 넘김.
 $avProducts = $null
 try {
     $avProducts = Get-CimInstance -Namespace 'root/SecurityCenter2' -ClassName 'AntivirusProduct' -ErrorAction Stop
